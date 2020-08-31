@@ -1,0 +1,27 @@
+{
+  "name": "hello-mongo",
+  "version": "0.0.0",
+  "description": "A demo express app to learn express with mongo",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "nodemon ./bin/www"
+  },
+  "keywords": [
+    "express",
+    "api",
+    "mongoose",
+    "learn"
+  ],
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "email-validator": "^2.0.4",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "mongoose": "^5.10.1",
+    "morgan": "~1.9.1"
+  }
+}
