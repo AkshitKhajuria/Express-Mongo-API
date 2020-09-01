@@ -36,48 +36,42 @@ function nullCheck(req, res, next) {
     }
 }
 
-function registerUser(req, res, next) {
+async function registerUser(req, res, next) {
     var { fname, lname, email, password } = req.body;
-    if (fname.length === 0) {
-        res.status(400).send({ message: "Please provide a first name." });
+    //hash the password
+    try {
+        var hashval = await bcrypt.hash(password, saltRounds);
+        let new_user = new userModel({
+            'fname': fname,
+            'lname': lname,
+            'email': email,
+            'password': hashval
+        });
+        new_user.save()
+            .then(doc => res.status(201).send({ message: "User created sucessfully." }))
+            .catch(err => res.status(500).send({ message: "Err! Unable to create user." }));
     }
-    else if (lname.length === 0) {
-        res.status(400).send({ message: "Please provide a last name." });
-    }
-    else if (password.length === 0) {
-        res.status(400).send({ message: "Please provide a password" });
-    }
-    else {
-        //hash the password
-        bcrypt.hash(password, saltRounds)
-            .then(hashval => {
-                let new_user = new userModel({
-                    'fname': fname,
-                    'lname': lname,
-                    'email': email,
-                    'password': hashval
-                });
-                new_user.save()
-                    .then(doc => res.status(201).send({ message: "User created sucessfully." }))
-                    .catch(err => res.status(500).send({ message: "Err! Unable to create user." }));
-            })
-            .catch(err => res.status(500).send({ message: "Error creating password." }));
+    catch (error) {
+        console.log(error);
+        res.status(500).send({ message: "Error creating user." });
     }
 }
 
-function userExists(req, res, next) {
+async function userExists(req, res, next) {
     const email = req.body.email;
-    userModel.find({ 'email': email }, (err, doc) => {
-        if (err) {
-            res.status(500).send({ message: "An error occured." });
-        }
-        else if (doc.length > 0) {
+    try {
+        var existing = await userModel.find({ 'email': email });
+        console.log(existing);
+        if (existing.length > 0) {
             res.status(409).send({ message: "User already exists." });
         }
         else {
             next();
         }
-    })
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occured." });
+    }
 }
 
 module.exports = { validEmail, userExists, registerUser, nullCheck };
